@@ -28,10 +28,10 @@ public class Engine {
     private final static char kv_separator = ':';
     private final static char special_variable = '%';
     public Pairing pairing = PairingFactory.getPairing("a.properties");
-    public Properties pkProp = loadPropFromFile("pk.properties");
-    public Properties skProp = loadPropFromFile("sk.properties");
-    public Properties ctProp = loadPropFromFile("ct.properties");
-    public Properties mkProp = loadPropFromFile("mk.properties");
+    public Properties pkProp = loadPropFromFile("data/pk.properties");
+    public Properties skProp = loadPropFromFile("data/sk.properties");
+    public Properties ctProp = loadPropFromFile("data/ct.properties");
+    public Properties mkProp = loadPropFromFile("data/mk.properties");
 
     public void decryptScript(StringBuilder scriptCT, Element ee) {
         Element tt = pairing.getGT().newElement();
@@ -131,10 +131,16 @@ public class Engine {
                     dataQueue.add(ek_pst);
                     break;
                 case "OP_OR":
-
+                    Element ek_left_or = (Element) dataQueue.poll();
+                    Element ek_right_or = (Element) dataQueue.poll();
+                    Element ek_or = OP_OR(ek_left_or,ek_right_or,pairing);
+                    dataQueue.add(ek_or);
                     break;
                 case "OP_AND":
-
+                    Element ek_left_and = (Element) dataQueue.poll();
+                    Element ek_right_and = (Element) dataQueue.poll();
+                    Element ek_and = OP_AND(ek_left_and,ek_right_and,pairing);
+                    dataQueue.add(ek_and);
                     break;
                 case "OP_DECRYPT":
                     String main_cipherStr = (String) dataQueue.poll();
@@ -158,7 +164,6 @@ public class Engine {
         }
 
     }
-
 
 
     public static String elementToString(Element e) {

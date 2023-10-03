@@ -216,7 +216,7 @@ public class ASBEmain {
         storeElementToFiles(asbe,ciph,sk);
 
         Element ee = asbe.getPairing().getGT().newElement();
-        asbe.decrypt(ciph, sk, ee);
+//        asbe.decrypt(ciph, sk, ee);
         Engine engine = new Engine();
 //        engine.decryptScript(stringBuilder, ee);
         engine.decryptScriptCT(asbe,stringBuilder,ciph,sk);

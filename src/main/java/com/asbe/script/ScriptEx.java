@@ -77,54 +77,20 @@ public class ScriptEx {
         return null;
     }
 
-    public Element OP_AND(SCiphertext ciphertext, Pairing pairing){
-        CTree tree = ciphertext.m_policy.get(0);
-        CTree tree_lchild = tree.m_child.get(0);
-        CTree tree_rchild = tree.m_child.get(1);
-        Element r = pairing.getZr().newElement();//某一结点秘密值为r
-        Element s_sub_r = pairing.getZr().newElement();//另一节点秘密值为s-r
-        Element res = pairing.getZr().newElement();
-
-        //先确认此节点是非叶子节点里的and
-        if (tree.m_type == 1){
-            if(tree_rchild != null && tree_lchild != null){
-                r = tree_lchild.m_s;
-                s_sub_r = tree_rchild.m_s;
-                res = r.add(s_sub_r);
-                return res;
-            }else{
-                return null;
-            }
-        } else if (tree.m_type == 1) {
-            System.out.println("you should choose the operation named OP_OR.");
-        }else{
-            System.out.println("It's a leaf node.");
-        }
-        return null;
+    public static Element OP_OR(Element ek_left_or, Element ek_right_or, Pairing pairing) {
+        Element sum = pairing.getGT().newElement();
+        sum.setToOne();
+        sum.mul(ek_left_or);
+        return sum;
     }
 
-    public Element OP_OR(SCiphertext ciphertext, Pairing pairing){
-        CTree tree = ciphertext.m_policy.get(0);
-        CTree tree_any_child = tree.m_child.get(0);
-        Element res = pairing.getZr().newElement();
-
-        //先确认此节点是非叶子节点里的or
-        if (tree.m_type == 2){
-            if(tree_any_child != null){
-                res = tree_any_child.m_s;
-                return res;
-            }else{
-                return null;
-            }
-        } else if (tree.m_type == 1) {
-            System.out.println("you should choose the operation named OP_AND.");
-        }else{
-            System.out.println("It's a leaf node.");
-        }
-        return null;
+    public static Element OP_AND(Element ek_left_and, Element ek_right_and,Pairing pairing) {
+        Element sum = pairing.getGT().newElement();
+        sum.setToOne();
+        sum.mul(ek_left_and);
+        sum.mul(ek_right_and);
+        return sum;
     }
-
-
     public static Element OP_DECRYPT(Element main_cipher, Element main_key, Element data, int b,Element ts,Element tw,Pairing pairing) {
         Element ek = pairing.getGT().newElement();
         if (b != 0) {
