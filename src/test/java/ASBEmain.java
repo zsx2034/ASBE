@@ -219,10 +219,10 @@ public class ASBEmain {
 //        asbe.decrypt(ciph, sk, ee);
         Engine engine = new Engine();
 //        engine.decryptScript(stringBuilder, ee);
-        engine.decryptScriptCT(asbe,stringBuilder,ciph,sk);
-        System.out.println("Decrypt ek: " + ee);
+        Element ekk = engine.decryptScriptCT(asbe, stringBuilder, ciph, sk);
+        System.out.println("Decrypt ek: " + ekk);
 
-        if (ee.equals(ek)) {
+        if (ekk.equals(ek)) {
             System.out.println("Decryption Success!");
         } else {
             System.out.println("Decryption Failure!");

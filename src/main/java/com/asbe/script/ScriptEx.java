@@ -91,17 +91,11 @@ public class ScriptEx {
         sum.mul(ek_right_and);
         return sum;
     }
-    public static Element OP_DECRYPT(Element main_cipher, Element main_key, Element data, int b,Element ts,Element tw,Pairing pairing) {
+    public static Element OP_DECRYPT(Element main_cipher, Element main_key, Element data, Element ts, Element tw, Pairing pairing) {
         Element ek = pairing.getGT().newElement();
-        if (b != 0) {
-
-            ts.set(pairing.pairing(main_key, main_cipher));
-            tw.set(ts.duplicate().div(data));
-            ek.set(tw);
-        } else {
-            System.out.println("Decryption Reconstruction Failure!");
-            ek.setToZero();
-        }
+        ts.set(pairing.pairing(main_key, main_cipher));
+        tw.set(ts.duplicate().div(data));
+        ek.set(tw);
         return ek;
     }
     //调用该函数前需对ek初始化
