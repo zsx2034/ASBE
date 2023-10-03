@@ -21,4 +21,11 @@ public class ElementTest {
             System.out.println("this is GT element.");
         }
     }
+
+    @Test
+    public void myTest() {
+        String str = "a|b";
+        String[] split = str.split("|");
+        System.out.println(split[0]);
+    }
 }

@@ -91,7 +91,7 @@ public class Engine {
                     String[] splitSubNegAttrDataStr = negAttrDataStr.split(":");
                     String attrSetNameNeg = splitSubNegAttrDataStr[0];
                     String attrListStrNeg = splitSubNegAttrDataStr[1];
-                    String[] attrListNeg = attrListStrNeg.split("|");
+                    String[] attrListNeg = attrListStrNeg.split("\\|");
                     CElementKey skNeg = OP_KEY_QUERY_NEG(key, pairing, cipher, attrSetNameNeg, attrListNeg);
                     if(skNeg == null){
                         System.out.println("解密失败！");
@@ -104,7 +104,7 @@ public class Engine {
                     String[] splitSubPstAttrDataStr = pstAttrDataStr.split(":");
                     String attrSetNamePst = splitSubPstAttrDataStr[0];
                     String attrListStrPst = splitSubPstAttrDataStr[1];
-                    String[] attrListPst = attrListStrPst.split("|");
+                    String[] attrListPst = attrListStrPst.split("\\|");
                     CElementKey skPst = OP_KEY_QUERY_PST(key, pairing, cipher, attrSetNamePst, attrListPst);
                     if(skPst == null){
                         System.out.println("解密失败！");
@@ -189,7 +189,8 @@ public class Engine {
     }
 
     public static Element stringToElement(String e, Pairing pairing) {
-        String[] strings = e.split(String.valueOf(param_separator));
+        String ee = e.substring(1, e.length() - 1);
+        String[] strings = ee.split("\\|");
         byte[] bytes = Base64.getDecoder().decode(strings[0]);
         switch (strings[1]) {
             case "G1" -> {

@@ -48,7 +48,7 @@ public class ScriptEx {
 
     public static CElementKey OP_KEY_QUERY_NEG_MAIN(SSetCiphertext ciphertext, SABEKey key, Pairing pairing, String attrSetName, String[] attrList) {
             int i = 0;
-            while(attrList[0] != ciphertext.m_attr.get(i).ElementsOfSet.get(0));
+            while(attrList[0].equals(ciphertext.m_attr.get(i).ElementsOfSet.get(0))) i ++;
             tempNodeIndex = i;
             SetCipher cph = ciphertext.m_attr.get(i);
             tempCph = cph;

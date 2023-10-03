@@ -131,16 +131,24 @@ public class ScriptProcessor {
     }
 
     public static Element stringToElement(String e, Pairing pairing) {
-        String[] strings = e.split("-");
+        String ee = e.substring(1, e.length() - 1);
+        String[] strings = ee.split("\\|");
         byte[] bytes = Base64.getDecoder().decode(strings[0]);
-        if (strings[1].equals("G1")) {
-            return pairing.getG1().newElementFromBytes(bytes);
-        } else if (strings[1].equals("GT")) {
-            return pairing.getGT().newElementFromBytes(bytes);
-        } else {
-            System.err.println("Error while decode string to element, Unknown element type: " + strings[1]);
-            System.exit(-1);
-            return null;
+        switch (strings[1]) {
+            case "G1" -> {
+                return pairing.getG1().newElementFromBytes(bytes);
+            }
+            case "GT" -> {
+                return pairing.getGT().newElementFromBytes(bytes);
+            }
+            case "Zr" -> {
+                return pairing.getZr().newElementFromBytes(bytes);
+            }
+            default -> {
+                System.err.println("Error while decode string to element, Unknown element type: " + strings[1]);
+                System.exit(-1);
+                return null;
+            }
         }
     }
 
