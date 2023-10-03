@@ -88,8 +88,7 @@ public class Engine {
             switch (oneScript){
                 case "OP_KEY_QUERY_NEG":
                     String negAttrDataStr = (String) dataQueue.poll();
-                    String subNegAttrDataStr = negAttrDataStr.substring(1, negAttrDataStr.length() - 1);
-                    String[] splitSubNegAttrDataStr = subNegAttrDataStr.split(":");
+                    String[] splitSubNegAttrDataStr = negAttrDataStr.split(":");
                     String attrSetNameNeg = splitSubNegAttrDataStr[0];
                     String attrListStrNeg = splitSubNegAttrDataStr[1];
                     String[] attrListNeg = attrListStrNeg.split("|");
@@ -102,8 +101,7 @@ public class Engine {
                     break;
                 case "OP_KEY_QUERY_PST":
                     String pstAttrDataStr = (String) dataQueue.poll();
-                    String subPstAttrDataStr = pstAttrDataStr.substring(1, pstAttrDataStr.length() - 1);
-                    String[] splitSubPstAttrDataStr = subPstAttrDataStr.split(":");
+                    String[] splitSubPstAttrDataStr = pstAttrDataStr.split(":");
                     String attrSetNamePst = splitSubPstAttrDataStr[0];
                     String attrListStrPst = splitSubPstAttrDataStr[1];
                     String[] attrListPst = attrListStrPst.split("|");
@@ -149,7 +147,8 @@ public class Engine {
                     dataQueue.add(elementToString(ek));
                     break;
                 default:
-                    dataQueue.add(oneScript);
+                    String subStr = oneScript.substring(1, oneScript.length() - 1);
+                    dataQueue.add(subStr);
                     break;
             }
         }
@@ -159,7 +158,6 @@ public class Engine {
         }
 
     }
-
 
 
 

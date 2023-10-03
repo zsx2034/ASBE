@@ -17,15 +17,17 @@ import java.util.List;
 public class ScriptEx {
 
     public static SetCipher tempCph = null;
-    public static SSetCiphertext tempCipher = null;
     public static int tempNodeIndex = -1;
+    public static SSetCiphertext tempCipher = null;
 
     public static CElementKey OP_KEY_QUERY_NEG(SABEKey key, Pairing pairing, SSetCiphertext cipher, String attrSetName, String[] attrList){
-        tempCipher = cipher;
+        if(tempCipher == null)
+            tempCipher = cipher;
         return OP_KEY_QUERY_NEG_MAIN(cipher,key, pairing,attrSetName,attrList);
     }
     public static CElementKey OP_KEY_QUERY_PST(SASBEKey key, Pairing pairing, SSetCiphertext cipher, String attrSetNamePst, String[] attrListPst) {
-        tempCipher = cipher;
+        if(tempCipher == null)
+            tempCipher = cipher;
         return OP_KEY_QUERY_NEG_MAIN(cipher,key, pairing,attrSetNamePst,attrListPst);
     }
     public static Element OP_DEC_ATTR_NEG(CElementKey sk_neg, Element c1_neg, Element c2_neg, Pairing pairing) {
@@ -121,6 +123,7 @@ public class ScriptEx {
         }
         return null;
     }
+
 
     public static Element OP_DECRYPT(Element main_cipher, Element main_key, Element data, int b,Element ts,Element tw,Pairing pairing) {
         Element ek = pairing.getGT().newElement();
