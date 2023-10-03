@@ -1,0 +1,10 @@
+Attribute Number:3
+1 name values 3
+1 Yan Zhu
+2 Xin Wang
+3 Feng Pu
+2 department values 2
+1 Computer
+2 Communication
+3 room values 1
+1 EE 202
