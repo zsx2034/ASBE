@@ -1,0 +1,26 @@
+Attribute Number:4
+1 identity values 8
+1 Yan-Zhu
+2 Xin-Wang
+3 Feng-Pu
+4 DanDan-Li
+5 Gaid
+6 Liguang-Yang
+7 Hongying-Lu
+8 Qirui-Guo
+2 department values 4
+1 School-Computer
+2 School-Communication
+3 School-Chemistry
+4 SChool-Control
+3 room values 4
+1 EE-202
+2 office-604
+3 Computer-602
+4 Christ-203
+4 Saraly values 5
+1 1000
+2 2000
+3 3000
+4 4000
+5 5000
