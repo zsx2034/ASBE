@@ -21,12 +21,12 @@ public class SCiphertext {
 
     //内部类CTree 参数表示树结构
     public class CTree {
-        int m_type;      //type 0:叶子节点 1:and  2:or
+        public int m_type;      //type 0:叶子节点 1:and  2:or
         int m_cno;       //Condition Number
         Element m_data;  //存储重构数据
-        Element m_s;     //存放密码数据
+        public Element m_s;     //存放密码数据
         int m_flag;     //标记重构中是否已经使用  1：未用（编译错误）
-        List<CTree> m_child;  //孩子
+        public List<CTree> m_child;  //孩子
 
         public CTree() {
 

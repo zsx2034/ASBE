@@ -404,9 +404,4 @@ public class SSetCiphertext extends SCiphertext {
     }
 }
 
-class SearchRet {
-
-    public int r;
-    public int ridx;
-}
  
