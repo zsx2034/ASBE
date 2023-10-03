@@ -1,5 +1,6 @@
 package com.asbe.script;
 
+import com.asbe.bean.CElementKey;
 import com.asbe.core.AttributeSetBasedEncryption;
 import com.asbe.core.SASBEKey;
 import com.asbe.core.SSetCiphertext;
@@ -15,9 +16,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
-import static com.asbe.script.ScriptEx.OP_DECRYPT;
-import static com.asbe.script.ScriptEx.OP_KEY_QUERY_NEG;
-
+import static com.asbe.script.ScriptEx.*;
 /**
  * @Author: QuanLin Du
  * @Date: 2023-10-02-11:14
@@ -83,28 +82,55 @@ public class Engine {
         for (int i = scriptStrList.length - 1 ; i >= 0 ; i --) {
             scriptStack.push(scriptStrList[i]);
         }
-        Queue<String> dataQueue = new LinkedList<>();
+        Queue<Object> dataQueue = new LinkedList<>();
         while(!scriptStack.empty()){
             String oneScript = scriptStack.pop();
             switch (oneScript){
                 case "OP_KEY_QUERY_NEG":
-                    String negAttrDataStr = dataQueue.poll();
+                    String negAttrDataStr = (String) dataQueue.poll();
                     String subNegAttrDataStr = negAttrDataStr.substring(1, negAttrDataStr.length() - 1);
                     String[] splitSubNegAttrDataStr = subNegAttrDataStr.split(":");
-                    String attrSetName = splitSubNegAttrDataStr[0];
-                    String attrListStr = splitSubNegAttrDataStr[1];
-                    String[] attrList = attrListStr.split("|");
-                    OP_KEY_QUERY_NEG(key,pairing,cipher,attrSetName,attrListStr);
-
+                    String attrSetNameNeg = splitSubNegAttrDataStr[0];
+                    String attrListStrNeg = splitSubNegAttrDataStr[1];
+                    String[] attrListNeg = attrListStrNeg.split("|");
+                    CElementKey skNeg = OP_KEY_QUERY_NEG(key, pairing, cipher, attrSetNameNeg, attrListNeg);
+                    if(skNeg == null){
+                        System.out.println("解密失败！");
+                        System.exit(0);
+                    }
+                    dataQueue.add(skNeg);
                     break;
                 case "OP_KEY_QUERY_PST":
-
+                    String pstAttrDataStr = (String) dataQueue.poll();
+                    String subPstAttrDataStr = pstAttrDataStr.substring(1, pstAttrDataStr.length() - 1);
+                    String[] splitSubPstAttrDataStr = subPstAttrDataStr.split(":");
+                    String attrSetNamePst = splitSubPstAttrDataStr[0];
+                    String attrListStrPst = splitSubPstAttrDataStr[1];
+                    String[] attrListPst = attrListStrPst.split("|");
+                    CElementKey skPst = OP_KEY_QUERY_PST(key, pairing, cipher, attrSetNamePst, attrListPst);
+                    if(skPst == null){
+                        System.out.println("解密失败！");
+                        System.exit(0);
+                    }
+                    dataQueue.add(skPst);
                     break;
                 case "OP_DEC_ATTR_NEG":
-
+                    CElementKey sk_neg = (CElementKey)dataQueue.poll();
+                    String c1_negStr = (String) dataQueue.poll();
+                    Element c1_neg = stringToElement(c1_negStr, pairing);
+                    String c2_negStr = (String) dataQueue.poll();
+                    Element c2_neg = stringToElement(c2_negStr, pairing);
+                    Element ek_neg = OP_DEC_ATTR_NEG(sk_neg, c1_neg, c2_neg, pairing);
+                    dataQueue.add(ek_neg);
                     break;
                 case "OP_DEC_ATTR_PST":
-
+                    CElementKey sk_pst = (CElementKey)dataQueue.poll();
+                    String c1_pstStr = (String) dataQueue.poll();
+                    Element c1_pst = stringToElement(c1_pstStr, pairing);
+                    String c2_pstStr = (String) dataQueue.poll();
+                    Element c2_pst = stringToElement(c2_pstStr, pairing);
+                    Element ek_pst = OP_DEC_ATTR_PST(sk_pst, c1_pst, c2_pst, pairing);
+                    dataQueue.add(ek_pst);
                     break;
                 case "OP_OR":
 
@@ -113,11 +139,11 @@ public class Engine {
 
                     break;
                 case "OP_DECRYPT":
-                    String main_cipherStr = dataQueue.poll();
+                    String main_cipherStr = (String) dataQueue.poll();
                     Element main_cipher = stringToElement(main_cipherStr, pairing);
-                    String main_keyStr = dataQueue.poll();
+                    String main_keyStr = (String) dataQueue.poll();
                     Element main_key = stringToElement(main_keyStr, pairing);
-                    String decryptDataStr = dataQueue.poll();
+                    String decryptDataStr = (String) dataQueue.poll();
                     Element data = stringToElement(decryptDataStr, pairing);
                     ek = OP_DECRYPT(main_cipher, main_key, data, b, ts, tw,pairing);
                     dataQueue.add(elementToString(ek));
@@ -128,11 +154,14 @@ public class Engine {
             }
         }
         if(dataQueue.size() == 1){
-            String res = dataQueue.poll();
+            String res = (String) dataQueue.poll();
             System.out.println(res);
         }
 
     }
+
+
+
 
     public static String elementToString(Element e) {
         if (e == null) {
