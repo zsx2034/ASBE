@@ -1,7 +1,13 @@
 import com.asbe.core.*;
+import com.asbe.script.Engine;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Base64;
+import java.util.Properties;
 import java.util.Scanner;
 
 import com.asbe.bean.CElementKey;
@@ -11,8 +17,16 @@ import com.asbe.bean.CSetElementKey;
 import com.asbe.bean.GenTreeRes;
 import com.asbe.bean.SetCipher;
 import com.asbe.bean.Type;
+import it.unisa.dia.gas.plaf.jpbc.field.curve.CurveElement;
+import it.unisa.dia.gas.plaf.jpbc.field.gt.GTFiniteElement;
+import it.unisa.dia.gas.plaf.jpbc.field.z.ZrElement;
 
 public class ASBEmain {
+    private final static char separator = ' ';
+    private final static char param_separator = '|';
+    private final static char kv_separator = ':';
+    private final static char special_variable = '%';
+
     public static void generateSetCipher(SSetCiphertext cipher, SSetAttributeList attr, Pairing pairing) {
 
         System.out.println("Please set the conditions on attribute:");
@@ -199,9 +213,13 @@ public class ASBEmain {
         ScriptProcessor1.generateScript(ciph, asbe, stringBuilder);
         System.out.println(stringBuilder);
 
+        storeElementToFiles(asbe,ciph,sk);
+
         Element ee = asbe.getPairing().getGT().newElement();
         asbe.decrypt(ciph, sk, ee);
-
+        Engine engine = new Engine();
+//        engine.decryptScript(stringBuilder, ee);
+        engine.decryptScriptCT(asbe,stringBuilder,ciph,sk);
         System.out.println("Decrypt ek: " + ee);
 
         if (ee.equals(ek)) {
@@ -211,4 +229,111 @@ public class ASBEmain {
         }
 
     }
+
+    private static void storeElementToFiles(AttributeSetBasedEncryption asbe,SSetCiphertext ciph,SASBEKey sk) {
+        Properties pkProp = new Properties();
+        pkProp.setProperty("m_h", elementToString(asbe.m_pk.m_h));
+        Properties finalPkProp = pkProp;
+        asbe.m_pk.m_set.m_attrList.stream().forEach(set->{
+            CSetAttribute elm = (CSetAttribute) set;
+            String m_attrname = elm.m_attrname;
+            elm.m_set.stream().forEach((attr)->{
+                finalPkProp.setProperty("pk"+"-"+"AH"+"-"+m_attrname+"-"+attr.m_Aset, elementToString(attr.m_AH));
+            });
+        });
+        storePropToFile(pkProp, "data/pk.properties");
+
+        Properties mkProp = new Properties();
+        mkProp.setProperty("m_g", elementToString(asbe.m_mk.m_g));
+        mkProp.setProperty("m_alpha", elementToString(asbe.m_mk.m_alpha));
+        mkProp.setProperty("m_beta", elementToString(asbe.m_mk.m_beta));
+        mkProp.setProperty("m_Atau",elementToString(asbe.m_mk.m_Atau.get(0)));
+        storePropToFile(mkProp, "data/mk.properties");
+
+        Properties ctProp = new Properties();
+        ctProp.setProperty("m_r",elementToString(ciph.m_r));
+        for (int i = 0 ; i < ciph.m_attr.size() ;i++) {
+            ctProp.setProperty("ct1"+"-"+i, elementToString(ciph.m_attr.get(i).c1));
+            ctProp.setProperty("ct2"+"-"+i, elementToString(ciph.m_attr.get(i).c2));
+        }
+        storePropToFile(ctProp, "data/ct.properties");
+
+        Properties skProp = new Properties();
+        skProp.setProperty("sk"+"-"+"mainKey",elementToString(sk.m_mainKey));
+        sk.m_keyList.stream().forEach(valueList->{
+            String m_strID = valueList.m_strID;
+            valueList.m_valueList.stream().forEach(value->{
+                skProp.setProperty("sk"+"-"+"msk"+"-"+m_strID+"-"+value.m_strID, elementToString(value.m_sk));
+            });
+        });
+        storePropToFile(skProp, "data/sk.properties");
+
+    }
+
+    public static String elementToString(Element e) {
+        if (e == null) {
+            return null;
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(Base64.getEncoder().encodeToString(e.toBytes()));
+        stringBuilder.append(param_separator);
+        if (e instanceof CurveElement) {
+            stringBuilder.append("G1");
+        } else if (e instanceof GTFiniteElement) {
+            stringBuilder.append("GT");
+        } else if (e instanceof ZrElement) {
+            stringBuilder.append("Zr");
+        } else {
+            System.err.println("Error while transfer element to string. Unknown element type.");
+            System.exit(-1);
+        }
+        stringBuilder.insert(0, "[");
+        stringBuilder.append("]");
+        return stringBuilder.toString();
+    }
+
+    public static Element stringToElement(String e, Pairing pairing) {
+        String[] strings = e.split(String.valueOf(param_separator));
+        byte[] bytes = Base64.getDecoder().decode(strings[0]);
+        switch (strings[1]) {
+            case "G1" -> {
+                return pairing.getG1().newElementFromBytes(bytes);
+            }
+            case "GT" -> {
+                return pairing.getGT().newElementFromBytes(bytes);
+            }
+            case "Zr" -> {
+                return pairing.getZr().newElementFromBytes(bytes);
+            }
+            default -> {
+                System.err.println("Error while decode string to element, Unknown element type: " + strings[1]);
+                System.exit(-1);
+                return null;
+            }
+        }
+    }
+    public static void storePropToFile(Properties prop, String fileName){
+        try(FileOutputStream out = new FileOutputStream(fileName)){
+            prop.store(out, null);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            System.out.println(fileName + " save failed!");
+            System.exit(-1);
+        }
+    }
+
+    public static Properties loadPropFromFile(String fileName) {
+        Properties prop = new Properties();
+        try (FileInputStream in = new FileInputStream(fileName)){
+            prop.load(in);
+        }
+        catch (IOException e){
+            e.printStackTrace();
+            System.out.println(fileName + " load failed!");
+            System.exit(-1);
+        }
+        return prop;
+    }
+
 }

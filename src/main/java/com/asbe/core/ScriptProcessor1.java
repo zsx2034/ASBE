@@ -143,7 +143,7 @@ public class ScriptProcessor1 {
     }
 
     public static Element stringToElement(String e, Pairing pairing) {
-        String[] strings = e.split("-");
+        String[] strings = e.split(String.valueOf(param_separator));
         byte[] bytes = Base64.getDecoder().decode(strings[0]);
         switch (strings[1]) {
             case "G1" -> {

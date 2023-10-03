@@ -34,7 +34,7 @@ public abstract class AbstractJPBC {
 
 	protected String curvePath;
     protected boolean usePBC;
-    protected Pairing pairing;
+    public Pairing pairing;
 
 
     public AbstractJPBC(boolean usePBC, String curvePath) {

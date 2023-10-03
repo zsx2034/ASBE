@@ -126,7 +126,7 @@ public class AttributeSetBasedEncryption extends CryptoSystemBase {
         Element th = pairing.getG2().newElement();
         Element test = pairing.getGT().newElement();
 
-        Element p = m_mk.m_Atau.get(0);
+        Element p = m_mk.m_Atau.get(0); //TODO
         tg.set(m_g.duplicate().powZn(p));
         th.set(m_h.duplicate().powZn(cipher.m_r));
         test.set(pairing.pairing(tg, th));
